@@ -7,47 +7,54 @@ require("dotenv").config();
 
 const app = express();
 
-// Middleware
+// ================= MIDDLEWARE =================
 app.use(express.json());
 app.use(cors());
 
-// ===== MongoDB Connection =====
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected"))
-    .catch((err) => console.log("MongoDB Error:", err));
+// ================= DATABASE CONNECTION =================
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch((err) => console.log("❌ MongoDB Error:", err.message));
 
-// ===== User Schema =====
+// ================= USER SCHEMA =================
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: [true, "Name is required"]
     },
     email: {
         type: String,
-        required: true,
+        required: [true, "Email is required"],
         unique: true
     },
     password: {
         type: String,
-        required: true
+        required: [true, "Password is required"]
     }
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
 
-// ===== Routes =====
-
-// Test route
+// ================= TEST ROUTE =================
 app.get("/", (req, res) => {
-    res.send("AI Fitness Coach Backend Running");
+    res.status(200).send("🚀 AI Fitness Coach Backend Running");
 });
 
-// ===== REGISTER =====
+// ================= REGISTER ROUTE =================
 app.post("/api/v1/user/auth/register", async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Check if user already exists
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
+        }
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -56,10 +63,8 @@ app.post("/api/v1/user/auth/register", async (req, res) => {
             });
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
         const user = new User({
             name,
             email,
@@ -82,12 +87,18 @@ app.post("/api/v1/user/auth/register", async (req, res) => {
     }
 });
 
-// ===== LOGIN =====
+// ================= LOGIN ROUTE =================
 app.post("/api/v1/user/auth/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Check user
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            });
+        }
+
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
@@ -96,7 +107,6 @@ app.post("/api/v1/user/auth/login", async (req, res) => {
             });
         }
 
-        // Compare password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({
@@ -105,10 +115,9 @@ app.post("/api/v1/user/auth/login", async (req, res) => {
             });
         }
 
-        // Create JWT token
         const token = jwt.sign(
             { id: user._id },
-            "your_secret_key",
+            process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
 
@@ -132,9 +141,9 @@ app.post("/api/v1/user/auth/login", async (req, res) => {
     }
 });
 
-// ===== Start Server =====
+// ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`🔥 Server running on port ${PORT}`);
 });
