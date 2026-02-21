@@ -1,47 +1,32 @@
 const userSchema = new mongoose.Schema({
 
-    name: {
-        type: String,
-        required: true
-    },
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
 
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
+  dob: String,
 
-    password: {
-        type: String,
-        required: true
-    },
+  gender: {
+    type: String,
+    enum: ["male", "female", "other"]
+  },
 
-    // ===== PROFILE FIELDS =====
+  height: Number,
+  weight: Number,
 
-    dob: {
-        type: String
-    },
+  fitness_level: {
+    type: String,
+    enum: ["beginner", "intermediate", "advanced"]
+  },
 
-    gender: {
-        type: String,
-        enum: ["male", "female", "other"]
-    },
+  injuries: [String],
 
-    height: Number,
-    weight: Number,
-
-    fitness_level: {
-        type: String,
-        enum: ["beginner", "intermediate", "advanced"]
-    },
-
-    injuries: [String],
-
-    preferences: {
-        fitness_goal: String,
-        target_weight: Number,
-        workout_place: String,
-        preferred_equipment: [String]
-    }
+  preferences: {
+    fitness_goal: String,
+    target_weight: Number,
+    workout_place: String,
+    preferred_equipment: [String]
+  }
 
 }, { timestamps: true });
+
