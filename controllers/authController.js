@@ -2,9 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// REGISTER
+// ================= REGISTER =================
 exports.register = async (req, res) => {
   try {
+
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
@@ -45,9 +46,10 @@ exports.register = async (req, res) => {
   }
 };
 
-// LOGIN
+// ================= LOGIN =================
 exports.login = async (req, res) => {
   try {
+
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -92,9 +94,10 @@ exports.login = async (req, res) => {
   }
 };
 
-// GET PROFILE
+// ================= GET PROFILE =================
 exports.getProfile = async (req, res) => {
   try {
+
     const user = await User.findById(req.user.id).select("-password");
 
     res.status(200).json({
@@ -110,20 +113,19 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// UPDATE PROFILE
+// ================= UPDATE PROFILE =================
 exports.updateProfile = async (req, res) => {
   try {
-    const { age, weight, height, goal } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { age, weight, height, goal },
+      req.body,
       { new: true }
     ).select("-password");
 
     res.status(200).json({
       success: true,
-      message: "Profile updated",
+      message: "Profile updated successfully",
       user: updatedUser
     });
 
