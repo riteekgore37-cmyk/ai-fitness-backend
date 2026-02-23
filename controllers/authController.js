@@ -6,12 +6,22 @@ const User = require("../models/User");
 exports.register = async (req, res) => {
   try {
 
-    const { name, email, password } = req.body;
+    const {
+      name,
+      email,
+      password,
+      height,
+      weight,
+      gender,
+      fitness_level,
+      injuries,
+      preferences
+    } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required"
+        message: "Name, email and password are required"
       });
     }
 
@@ -26,15 +36,41 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      height,
+      weight,
+      gender,
+      fitness_level,
+      injuries,
+      preferences,
+      onboardingCompleted: true
     });
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully"
+      message: "User registered successfully",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        height: user.height,
+        weight: user.weight,
+        gender: user.gender,
+        fitness_level: user.fitness_level,
+        injuries: user.injuries,
+        preferences: user.preferences,
+        onboardingCompleted: user.onboardingCompleted
+      }
     });
 
   } catch (error) {
@@ -45,7 +81,6 @@ exports.register = async (req, res) => {
     });
   }
 };
-
 // ================= LOGIN =================
 exports.login = async (req, res) => {
   try {
@@ -141,3 +176,4 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
+
