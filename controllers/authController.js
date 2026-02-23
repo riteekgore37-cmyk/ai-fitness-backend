@@ -114,12 +114,16 @@ exports.getProfile = async (req, res) => {
 };
 
 // ================= UPDATE PROFILE =================
+// UPDATE PROFILE
 exports.updateProfile = async (req, res) => {
   try {
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      req.body,
+      {
+        ...req.body,
+        onboardingCompleted: true
+      },
       { new: true }
     ).select("-password");
 
@@ -132,7 +136,8 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Server error"
+      message: "Server error",
+      error: error.message
     });
   }
 };
