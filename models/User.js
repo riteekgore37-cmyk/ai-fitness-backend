@@ -18,8 +18,11 @@ const userSchema = new mongoose.Schema({
     required: true
   },
 
-  // Profile Fields
-  dob: String,
+  // ===== PROFILE FIELDS =====
+
+  dob: {
+    type: String
+  },
 
   gender: {
     type: String,
@@ -41,6 +44,12 @@ const userSchema = new mongoose.Schema({
     target_weight: Number,
     workout_place: String,
     preferred_equipment: [String]
+  },
+
+  // ===== IMPORTANT FIELD =====
+  onboardingCompleted: {
+    type: Boolean,
+    default: false
   }
 
 }, { timestamps: true });
