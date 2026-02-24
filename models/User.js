@@ -20,33 +20,34 @@ const userSchema = new mongoose.Schema({
 
   // ===== PROFILE FIELDS =====
 
-  dob: {
-    type: String
-  },
+  dob: String,
 
   gender: {
     type: String,
     enum: ["male", "female", "other"]
   },
 
-  height: Number,
-  weight: Number,
+  height: Number, // in cm
+  weight: Number, // in kg
 
   fitness_level: {
     type: String,
     enum: ["beginner", "intermediate", "advanced"]
   },
 
+  fitness_goal: {
+    type: String,
+    enum: ["weight_loss", "muscle_gain", "maintenance"]
+  },
+
   injuries: [String],
 
   preferences: {
-    fitness_goal: String,
     target_weight: Number,
     workout_place: String,
     preferred_equipment: [String]
   },
 
-  // ===== IMPORTANT FIELD =====
   onboardingCompleted: {
     type: Boolean,
     default: false
