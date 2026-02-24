@@ -2,6 +2,39 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+// ===== HELPER FUNCTIONS =====
+
+// Calculate Age from DOB
+const calculateAge = (dob) => {
+  if (!dob) return null;
+  const birthDate = new Date(dob);
+  const diff = Date.now() - birthDate.getTime();
+  const ageDate = new Date(diff);
+  return Math.abs(ageDate.getUTCFullYear() - 1970);
+};
+
+// Calculate BMI
+const calculateBMI = (weight, height) => {
+  if (!weight || !height) return null;
+  const heightInMeters = height / 100;
+  return (weight / (heightInMeters * heightInMeters)).toFixed(1);
+};
+
+// Calculate Daily Calories
+const calculateCalories = (weight, fitness_level, goal) => {
+  if (!weight) return null;
+
+  let baseCalories = weight * 30;
+
+  if (fitness_level === "intermediate") baseCalories += 200;
+  if (fitness_level === "advanced") baseCalories += 400;
+
+  if (goal === "weight_loss") baseCalories -= 300;
+  if (goal === "muscle_gain") baseCalories += 300;
+
+  return baseCalories;
+};
+
 // ================= REGISTER =================
 exports.register = async (req, res) => {
   try {
@@ -10,10 +43,12 @@ exports.register = async (req, res) => {
       name,
       email,
       password,
+      dob,
       height,
       weight,
       gender,
       fitness_level,
+      fitness_goal,
       injuries,
       preferences
     } = req.body;
@@ -40,10 +75,12 @@ exports.register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      dob,
       height,
       weight,
       gender,
       fitness_level,
+      fitness_goal,
       injuries,
       preferences,
       onboardingCompleted: true
@@ -57,20 +94,8 @@ exports.register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        height: user.height,
-        weight: user.weight,
-        gender: user.gender,
-        fitness_level: user.fitness_level,
-        injuries: user.injuries,
-        preferences: user.preferences,
-        onboardingCompleted: user.onboardingCompleted
-      }
+      user: user
     });
 
   } catch (error) {
@@ -81,6 +106,7 @@ exports.register = async (req, res) => {
     });
   }
 };
+
 // ================= LOGIN =================
 exports.login = async (req, res) => {
   try {
@@ -114,11 +140,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       success: true,
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
+      user: user
     });
 
   } catch (error) {
@@ -135,9 +157,22 @@ exports.getProfile = async (req, res) => {
 
     const user = await User.findById(req.user.id).select("-password");
 
+    const age = calculateAge(user.dob);
+    const bmi = calculateBMI(user.weight, user.height);
+    const daily_calories = calculateCalories(
+      user.weight,
+      user.fitness_level,
+      user.fitness_goal
+    );
+
     res.status(200).json({
       success: true,
-      user
+      user: {
+        ...user._doc,
+        age,
+        bmi,
+        daily_calories
+      }
     });
 
   } catch (error) {
@@ -149,7 +184,6 @@ exports.getProfile = async (req, res) => {
 };
 
 // ================= UPDATE PROFILE =================
-// UPDATE PROFILE
 exports.updateProfile = async (req, res) => {
   try {
 
@@ -171,9 +205,7 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Server error",
-      error: error.message
+      message: "Server error"
     });
   }
 };
-
