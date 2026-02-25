@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const protect = require("../middleware/authMiddleware");
 
 /* ================= WORKOUTS ================= */
 
-router.get("/workouts", protect, (req, res) => {
+router.get("/workouts", (req, res) => {
   res.json({
     success: true,
     data: [
@@ -14,7 +13,7 @@ router.get("/workouts", protect, (req, res) => {
   });
 });
 
-router.get("/myWorkouts", protect, (req, res) => {
+router.get("/myWorkouts", (req, res) => {
   res.json({
     success: true,
     data: [
@@ -23,18 +22,9 @@ router.get("/myWorkouts", protect, (req, res) => {
   });
 });
 
-router.get("/templates", protect, (req, res) => {
-  res.json({
-    success: true,
-    data: [
-      { _id: "1", name: "Muscle Gain Template" }
-    ]
-  });
-});
-
 /* ================= NUTRITION ================= */
 
-router.get("/nutri-guide/today-meals", protect, (req, res) => {
+router.get("/nutri-guide/today-meals", (req, res) => {
   res.json({
     success: true,
     data: [
@@ -44,7 +34,7 @@ router.get("/nutri-guide/today-meals", protect, (req, res) => {
   });
 });
 
-router.get("/nutri-guide/daily-goals", protect, (req, res) => {
+router.get("/nutri-guide/daily-goals", (req, res) => {
   res.json({
     success: true,
     data: {
@@ -56,7 +46,7 @@ router.get("/nutri-guide/daily-goals", protect, (req, res) => {
   });
 });
 
-router.get("/nutri-guide/todays-intake", protect, (req, res) => {
+router.get("/nutri-guide/todays-intake", (req, res) => {
   res.json({
     success: true,
     data: {
@@ -70,7 +60,7 @@ router.get("/nutri-guide/todays-intake", protect, (req, res) => {
 
 /* ================= MEAL PLANS ================= */
 
-router.get("/myMealPlan", protect, (req, res) => {
+router.get("/myMealPlan", (req, res) => {
   res.json({
     success: true,
     data: {
@@ -80,7 +70,7 @@ router.get("/myMealPlan", protect, (req, res) => {
   });
 });
 
-router.get("/mealPlans", protect, (req, res) => {
+router.get("/mealPlans", (req, res) => {
   res.json({
     success: true,
     data: [
