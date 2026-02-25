@@ -11,6 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ MongoDB Error:", err.message));
@@ -19,10 +20,8 @@ app.get("/", (req, res) => {
   res.send("🚀 AI Fitness Coach Backend Running");
 });
 
-/* AUTH ROUTES */
+// Routes
 app.use("/api/v1/user", authRoutes);
-
-/* USER FEATURE ROUTES */
 app.use("/api/v1/user", userRoutes);
 
 const PORT = process.env.PORT || 5000;
