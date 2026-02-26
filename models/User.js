@@ -48,6 +48,14 @@ const userSchema = new mongoose.Schema({
     preferred_equipment: [String]
   },
 
+  // ✅ ADD THIS SECTION
+  enrolledWorkouts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workout"
+    }
+  ],
+
   onboardingCompleted: {
     type: Boolean,
     default: false
